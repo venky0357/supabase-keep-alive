@@ -2,10 +2,10 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    # Runs every day at 9:47 AM IST (04:17 UTC)
+    # Every day at 9:47 AM IST
     - cron: "17 04 * * *"
 
-  # Allows you to manually run the workflow from GitHub
+  # Allows manual testing from GitHub
   workflow_dispatch:
 
 jobs:
@@ -13,11 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ping Supabase
+      - name: Ping Supabase database
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/songs?select=id&limit=1" \
-            -H "apikey: ${SUPABASE_ANON_KEY}")
+            "${SUPABASE_URL}/rest/v1/keep_alive?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
 
           echo "Supabase response: $response"
 
@@ -26,7 +27,8 @@ jobs:
             exit 1
           fi
 
-          echo "Supabase is active"
+          echo "Supabase keep-alive request successful"
+
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
